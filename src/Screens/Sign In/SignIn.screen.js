@@ -1,25 +1,24 @@
 import React from 'react';
-import {
-  TouchableWithoutFeedback,
-  View,
-  Text,
-  TouchableOpacity,
-} from 'react-native';
-import {Icon, Input} from '@ui-kitten/components';
-import styled from 'styled-components/native';
+import {View, Text, TouchableOpacity, Keyboard, StyleSheet} from 'react-native';
+import {Icon, Input, CheckBox} from '@ui-kitten/components';
 import {Formik} from 'formik';
 import * as yup from 'yup';
+import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
+
+import Loading from '../../components/Loading.component';
 
 const AlertIcon = (props) => <Icon {...props} name="alert-circle-outline" />;
 
 const SignIn = ({navigation}) => {
   const [secureTextEntry, setSecureTextEntry] = React.useState(true);
+  const [check, setCheck] = React.useState(false);
+  const [TextCursorColor] = React.useState('blue');
+  const [isLoading, setLoading] = React.useState(false);
 
   const SignInValidationSchema = yup.object({
     Username: yup.string().required('Required*'),
     Email: yup.string().required('Required*').email(),
-    Password: yup.string().required('Required*'),
-    Terms: yup.boolean().required('You Have to Agree The Terms'),
+    Password: yup.string().required('Required*').min(8),
   });
 
   const toggleSecureEntry = () => {
@@ -31,66 +30,99 @@ const SignIn = ({navigation}) => {
       <Icon {...props} name={secureTextEntry ? 'eye-off' : 'eye'} />
     </TouchableWithoutFeedback>
   );
+
   return (
-    <Container>
+    <View style={styles.Container}>
       <Formik
         initialValues={{
           Username: '',
           Email: '',
           Password: '',
-          Terms: false,
         }}
-        validationSchema={SignInValidationSchema}>
+        validationSchema={SignInValidationSchema}
+        onSubmit={(values, action) => {
+          action.resetForm();
+          console.log(values);
+        }}>
         {(formikprops) => (
-          <View style={{width: '80%'}}>
-            <H1>SIGN IN</H1>
+          <TouchableWithoutFeedback
+            style={{
+              flex: 0.9,
+              width: 320,
+              marginTop: '50%',
+            }}
+            onPress={Keyboard.dismiss}>
+            <Text style={styles.H1}>News Today</Text>
             <Input
-              selectionColor={'grey'}
+              selectionColor={TextCursorColor}
               value={formikprops.values.Email}
               label="Email"
-              caption="Make Sure You Provide Valid Email Address"
+              caption={
+                <Text style={{color: 'red'}}>{formikprops.errors.Email}</Text>
+              }
               onChangeText={formikprops.handleChange('Email')}
               keyboardType={'email-address'}
             />
-            <Text style={{color: 'red'}}>{formikprops.errors.Email}</Text>
+
             <Input
+              selectionColor={TextCursorColor}
               value={formikprops.values.Password}
               label="Password"
-              caption="Should contain at least 8 symbols"
+              caption={
+                <Text style={{color: 'red'}}>
+                  {formikprops.errors.Password}
+                </Text>
+              }
               accessoryRight={renderIcon}
               captionIcon={AlertIcon}
               secureTextEntry={secureTextEntry}
               onChangeText={formikprops.handleChange('Password')}
             />
-            <TouchableOpacity
-              style={{
-                backgroundColor: 'dodgerblue',
-                width: '40%',
-                alignItems: 'center',
-                padding: 10,
-                borderRadius: 100,
-                marginLeft: '30%',
-                marginTop: 20,
-              }}>
-              <Text style={{color: 'white'}}>Sign in</Text>
-            </TouchableOpacity>
-          </View>
+            <CheckBox
+              style={{marginTop: 10}}
+              checked={check}
+              onChange={(newChecked) => setCheck(newChecked)}>
+              I Agree Terms and Condition©
+            </CheckBox>
+            {isLoading ? (
+              <Loading />
+            ) : (
+              <TouchableOpacity
+                style={{
+                  backgroundColor: 'blue',
+                  alignItems: 'center',
+                  padding: 10,
+                  borderRadius: 100,
+                  marginTop: 20,
+                }}
+                disabled={!check}
+                onPress={formikprops.handleSubmit}>
+                <Text style={{color: 'white', textAlign: 'center'}}>
+                  {!check ? 'Agree terms To Proceed' : 'SIGN IN'}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </TouchableWithoutFeedback>
         )}
       </Formik>
-    </Container>
+      <View style={{flex: 0.1}}>
+        <Text>Made With ❤ 2021</Text>
+      </View>
+    </View>
   );
 };
 
-const Container = styled.View`
-  flex: 1;
-  background-color: white;
-  align-items: center;
-  justify-content: center;
-`;
-
-const H1 = styled.Text`
-  font-size: 32px;
-  margin-bottom: 20;
-`;
+const styles = StyleSheet.create({
+  Container: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    backgroundColor: 'white',
+  },
+  H1: {
+    fontSize: 32,
+    marginBottom: 20,
+  },
+});
 
 export default SignIn;

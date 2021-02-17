@@ -11,16 +11,22 @@ class Splash extends Component {
       <View
         style={{
           flex: 1,
-          backgroundColor: 'white',
-          justifyContent: 'center',
-          alignContent: 'center',
+          backgroundColor: '#fff',
         }}>
         <LottieView
-          source={require('../../../assets/splashAnimation.json')}
+          source={require('../../../assets/SplashLoading.json')}
           autoPlay
           loop={false}
           onAnimationFinish={() => this.props.navigation.replace('SignIn')}
         />
+        <Text
+          style={{
+            fontSize: 32,
+            marginLeft: '30%',
+            marginTop: '25%',
+          }}>
+          News Today
+        </Text>
       </View>
     );
   }
