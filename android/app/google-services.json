@@ -7,12 +7,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:860162144476:android:4dab858e56dd9336965c19",
+        "mobilesdk_app_id": "1:860162144476:android:06db2e9fdd1c6402965c19",
         "android_client_info": {
           "package_name": "com.newstoday"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "860162144476-kheph8cvu7g3446lgnv12scpb96udu1h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.newstoday",
+            "certificate_hash": "c7b758ad4a4c2e54db97e48a99f781026af3cc0f"
+          }
+        },
         {
           "client_id": "860162144476-achn234os1o7hioi5pp3rp01omklfa0a.apps.googleusercontent.com",
           "client_type": 3

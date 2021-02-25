@@ -1,9 +1,21 @@
 import React from 'react';
-import {View, Text, TouchableOpacity, Keyboard, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Keyboard,
+  StyleSheet,
+  Alert,
+} from 'react-native';
 import {Icon, Input, CheckBox} from '@ui-kitten/components';
 import {Formik} from 'formik';
 import * as yup from 'yup';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
+import {
+  GoogleSigninButton,
+  GoogleSignin,
+} from '@react-native-community/google-signin';
+import * as firebase from 'firebase';
 
 import Loading from '../../components/Loading.component';
 
@@ -14,9 +26,9 @@ const SignIn = ({navigation}) => {
   const [check, setCheck] = React.useState(false);
   const [TextCursorColor] = React.useState('blue');
   const [isLoading, setLoading] = React.useState(false);
+  const [user, setUser] = React.useState(false);
 
   const SignInValidationSchema = yup.object({
-    Username: yup.string().required('Required*'),
     Email: yup.string().required('Required*').email(),
     Password: yup.string().required('Required*').min(8),
   });
@@ -31,11 +43,34 @@ const SignIn = ({navigation}) => {
     </TouchableWithoutFeedback>
   );
 
+  const signInWithGoogle = async () => {
+    try {
+      GoogleSignin.configure({
+        webClientId:
+          '860162144476-achn234os1o7hioi5pp3rp01omklfa0a.apps.googleusercontent.com',
+      });
+      const data = await GoogleSignin.signIn();
+      const credential = firebase.default.auth.GoogleAuthProvider.credential(
+        data.idToken,
+        data.accessToken,
+      );
+      const firebaseCredential = await firebase.default
+        .auth()
+        .signInWithCredential(credential);
+      if (firebaseCredential) {
+        //do Something
+      }
+      if (typeof success === 'function') success();
+    } catch (e) {
+      console.warn('GOOGLE ERROR', e);
+      if (typeof cancel == 'function') cancel();
+    }
+  };
+
   return (
     <View style={styles.Container}>
       <Formik
         initialValues={{
-          Username: '',
           Email: '',
           Password: '',
         }}
@@ -49,7 +84,7 @@ const SignIn = ({navigation}) => {
             style={{
               flex: 0.9,
               width: 320,
-              marginTop: '50%',
+              marginTop: '40%',
             }}
             onPress={Keyboard.dismiss}>
             <Text style={styles.H1}>News Today</Text>
@@ -96,7 +131,7 @@ const SignIn = ({navigation}) => {
                   marginTop: 20,
                 }}
                 disabled={!check}
-                onPress={formikprops.handleSubmit}>
+                onPress={() => formikprops.handleSubmit()}>
                 <Text style={{color: 'white', textAlign: 'center'}}>
                   {!check ? 'Agree terms To Proceed' : 'SIGN IN'}
                 </Text>
@@ -105,23 +140,29 @@ const SignIn = ({navigation}) => {
           </TouchableWithoutFeedback>
         )}
       </Formik>
-      <View style={{flex: 0.1}}>
-        <Text>Made With ❤ 2021</Text>
-      </View>
+      <GoogleSigninButton
+        style={styles.signInButton}
+        size={GoogleSigninButton.Size.Wide}
+        color={GoogleSigninButton.Color.Light}
+        onPress={() => signInWithGoogle()}
+      />
+      <Text style={{bottom: 10}}>Made With ❤ 2021</Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   Container: {
-    width: '100%',
-    height: '100%',
+    flex: 1,
     alignItems: 'center',
     backgroundColor: 'white',
   },
   H1: {
     fontSize: 32,
     marginBottom: 20,
+  },
+  signInButton: {
+    bottom: 50,
   },
 });
 

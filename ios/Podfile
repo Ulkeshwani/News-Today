@@ -8,6 +8,10 @@ target 'NewsToday' do
 
   use_react_native!(:path => config["reactNativePath"])
 
+  pod 'react-native-webview', :path => '../node_modules/react-native-webview'
+
+  pod 'RNGoogleSignin', :path => '../node_modules/react-native-google-signin'
+
   target 'NewsTodayTests' do
     inherit! :complete
     # Pods for testing

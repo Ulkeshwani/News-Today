@@ -1,13 +1,6 @@
 import React, {Component} from 'react';
-import {
-  ActivityIndicator,
-  Colors,
-  Searchbar,
-  FAB,
-  Portal,
-} from 'react-native-paper';
+import {ActivityIndicator, Colors, FAB, Portal} from 'react-native-paper';
 import {View, StyleSheet, RefreshControl} from 'react-native';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import GetNews from '../../E2E/News.api';
 import {KEY} from '../../E2E/NewsAPIKEY';
@@ -26,12 +19,9 @@ class Home extends Component {
       News: [],
       Topic: 'top-headlines',
       category: 'business',
-      countryCode: 'in',
+      countryCode: 'us',
       loading: false,
       isDone: false,
-      statusCode: null,
-      searchField: '',
-      visible: false,
     };
   }
 
@@ -111,18 +101,6 @@ class Home extends Component {
 
     return (
       <View style={styles.Container}>
-        <View style={{paddingBottom: 10, width: '100%', height: 60}}>
-          <Searchbar
-            placeholder={`Search From ${
-              News.totalResults ? News.totalResults : '...'
-            } Topics`}
-            style={{borderRadius: 25}}
-            selectionColor="dodgerblue"
-            onChangeText={this.handleQueryChange}
-            value={searchField}
-          />
-        </View>
-        <HeaderIcon />
         {!isDone ? (
           <ActivityIndicator
             style={{height: '100%'}}
@@ -139,13 +117,15 @@ class Home extends Component {
               />
             }>
             {News.articles.map(
-              ({title, urlToImage, content, source: {name}}, index) => (
+              ({title, urlToImage, url, content, source: {name}}, index) => (
                 <NewsCard
                   NewsTitle={title}
                   NewsImg={urlToImage}
                   key={index}
                   content={content}
                   name={name}
+                  NewsUrl={url}
+                  navigation={this.props.navigation}
                 />
               ),
             )}

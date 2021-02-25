@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {EvaIconsPack} from '@ui-kitten/eva-icons';
 import * as eva from '@eva-design/eva';
 import {ApplicationProvider, IconRegistry} from '@ui-kitten/components';
@@ -12,12 +12,81 @@ import Home from './Screens/Home/Home.Screen';
 import Profile from './Screens/Profile/Profile.screen';
 import Splash from './Screens/splash Screen/splash.screen';
 import SignIn from './Screens/Sign In/SignIn.screen';
+import NewsWebview from './components/NewsWebview.component';
+import {firebaseConfig} from './E2E/Google Auth Provider/config';
+
+import * as firebase from 'firebase';
+import {Alert} from 'react-native';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
+const HomeStack = createStackNavigator();
+
+if (!firebase.apps.length) {
+  firebase.default.initializeApp(firebaseConfig);
+} else {
+  firebase.default.app(); // if already initialized, use that one
+}
 
 const App = () => {
-  const [IsAuthedUser, setAuthedUser] = React.useState(true);
+  const [IsAuthedUser, setAuthedUser] = React.useState(null);
+
+  React.useEffect(() => {
+    checkIfLoggedIn();
+  }, []);
+
+  const checkIfLoggedIn = async () => {
+    firebase.default.auth().onAuthStateChanged((user) => {
+      if (user) {
+        setAuthedUser(user);
+      } else {
+        setAuthedUser(null);
+      }
+    });
+    console.log('Checked Login');
+  };
+
+  const signOut = async () => {
+    await firebase.default
+      .auth()
+      .signOut()
+      .then(async () => {
+        await Alert.alert('Success', 'Logged Out Successfully');
+        setAuthedUser(false);
+      });
+  };
+
+  function HomeStackScreen() {
+    return (
+      <HomeStack.Navigator>
+        <HomeStack.Screen
+          name="Home"
+          component={Home}
+          options={{
+            title: 'Daily News',
+            headerRight: () => (
+              <MaterialCommunityIcons
+                name="account-arrow-right-outline"
+                size={24}
+                color="dodgerblue"
+                style={{paddingRight: 10}}
+                onPress={signOut}
+              />
+            ),
+            headerLeft: () => (
+              <MaterialCommunityIcons
+                name="newspaper-variant"
+                size={24}
+                color="dodgerblue"
+                style={{paddingLeft: 10}}
+              />
+            ),
+          }}
+        />
+        <HomeStack.Screen name="Article" component={NewsWebview} />
+      </HomeStack.Navigator>
+    );
+  }
 
   return !IsAuthedUser ? (
     <NavigationContainer>
@@ -41,14 +110,14 @@ const App = () => {
           backgroundColor: 'dodgerblue',
         }}>
         <Tab.Screen
-          name="Home"
-          component={Home}
+          name="Home Screen"
+          component={HomeStackScreen}
           options={{
-            tabBarLabel: 'News Today',
+            tabBarLabel: 'Home',
             tabBarColor: '#009387',
             tabBarIcon: ({color}) => (
               <MaterialCommunityIcons
-                name="newspaper"
+                name="newspaper-variant"
                 color={color}
                 size={26}
               />
@@ -56,13 +125,13 @@ const App = () => {
           }}
         />
         <Tab.Screen
-          name="History"
+          name="Profile"
           component={Profile}
           options={{
             tabBarColor: '#1f65ff',
-            tabBarLabel: 'History',
+            tabBarLabel: 'Profile',
             tabBarIcon: ({color}) => (
-              <MaterialCommunityIcons name="history" color={color} size={26} />
+              <MaterialCommunityIcons name="account" color={color} size={26} />
             ),
           }}
         />
