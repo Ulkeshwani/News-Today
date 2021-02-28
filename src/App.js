@@ -17,6 +17,7 @@ import {firebaseConfig} from './E2E/Google Auth Provider/config';
 
 import * as firebase from 'firebase';
 import {Alert} from 'react-native';
+import Signup from './Screens/Signup/Signup.screen';
 
 const Stack = createStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -92,10 +93,15 @@ const App = () => {
     <NavigationContainer>
       <Stack.Navigator
         screenOptions={{
-          headerShown: false,
+          headerShown: true,
         }}>
-        <Stack.Screen name="Splash" component={Splash} />
+        <Stack.Screen
+          name="Splash"
+          component={Splash}
+          options={{title: 'Welcome Back!'}}
+        />
         <Stack.Screen name="SignIn" component={SignIn} />
+        <Stack.Screen name="Sign-Up" component={Signup} />
       </Stack.Navigator>
     </NavigationContainer>
   ) : (
